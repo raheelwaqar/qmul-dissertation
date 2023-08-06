@@ -1,5 +1,4 @@
-# qmul-dissertation
-Queen Mary University of London Dissertation
+# Queen Mary University of London Dissertation
 
 **Analysis of TFL data**
 
