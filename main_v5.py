@@ -266,6 +266,9 @@ def main():
     print(kendall_df)
 
     linkage_matrix = calculate_linkage(kendall_df)
+
+    print(linkage_matrix)
+
     draw_dendrogram(kendall_df, linkage_matrix)
 
 
