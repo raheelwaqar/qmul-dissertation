@@ -260,7 +260,6 @@ def main():
     # obtain centrality list for the main edge file
     main_centrality_list = calculate_centrality_measure(nodes_df, edges_df, main_edge_file, top20=True)
 
-    print(main_centrality_list)
     disruption_centrality_list = calculate_disruption_centrality_measures(visualize_graph=False)
 
     kendall_df = calculate_kendalltau(disruption_centrality_list, main_centrality_list)
