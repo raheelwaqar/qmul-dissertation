@@ -1,5 +1,5 @@
 import unittest
-import pandas as pd  
+import pandas as pd
 
 
 from main import is_square_matrix, read_data, create_graph
@@ -28,8 +28,6 @@ class TflTestCases(unittest.TestCase):
         graph = create_graph(nodes_df, edges_df)
         self.assertEqual(len(graph.nodes), 2)
         self.assertEqual(len(graph.edges), 1)
-
-    # You can continue with similar test methods for other functions
 
 
 if __name__ == '__main__':
