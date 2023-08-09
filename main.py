@@ -1,4 +1,5 @@
 import json
+import logging
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -11,6 +12,17 @@ from config import main_edge_file, node_file, disruption_edge_files, kendalltau_
 # To show all rows and columns, adjust the display options:
 pd.set_option('display.max_rows', None)  # Show all rows
 pd.set_option('display.max_columns', None)  # Show all columns
+
+
+# Function to check whether a matrix is square or not
+def is_square_matrix(df):
+    # Check if it's a square matrix
+    num_rows, num_cols = df.shape
+    if num_rows == num_cols:
+        print("The matrix is a square matrix.")
+    else:
+        print("The matrix is not a square matrix.")
+    return num_rows == num_cols
 
 
 # Function to read data from files
@@ -162,26 +174,32 @@ def calculate_kendalltau(disruption_centrality_list, main_centrality_list):
     main_centrality_values = get_specific_centrality_values(main_centrality_list, centrality_type="betweenness",
                                                             is_weighted=True)
     stations = [item[0] for item in main_centrality_values]
+
+    print("Main stations with centrality values", main_centrality_values)
     finalized_rank_dic = dict()
     main_ranks = list(range(20, 0, -1))
-    finalized_rank_dic['main'] = main_ranks
-    for individual_disruption in disruption_centrality_list:
-        data = get_specific_centrality_values(individual_disruption, centrality_type="betweenness",
-                                                            is_weighted=True)
+    # finalized_rank_dic['main'] = main_ranks
+    file_name = ""
+    try:
+        for individual_disruption in disruption_centrality_list:
+            data = get_specific_centrality_values(individual_disruption, centrality_type="betweenness",
+                                                  is_weighted=True)
 
-        individual_disruption_data = json.loads(individual_disruption[0])
-        file_name = individual_disruption_data.get("file_name")
+            individual_disruption_data = json.loads(individual_disruption[0])
+            file_name = individual_disruption_data.get("file_name")
 
-        ranked_data = sorted(data, key=lambda x: x[1], reverse=True)
-        ranks = [x + 1 for x in range(len(data))]
-        ranked_data = [[station, rank] for (station, value), rank in zip(ranked_data, ranks)]
+            ranked_data = sorted(data, key=lambda x: x[1], reverse=True)
+            ranks = [x + 1 for x in range(len(data))]
+            ranked_data = [[station, rank] for (station, value), rank in zip(ranked_data, ranks)]
 
-        ranked_dict = {station: rank for station, rank in ranked_data}
-        disruption_ranks = [ranked_dict[station] for station in stations]
+            ranked_dict = {station: rank for station, rank in ranked_data}
+            disruption_ranks = [ranked_dict[station] for station in stations]
 
-        if len(main_ranks) == len(disruption_ranks):
-            file = file_name.split(".")[0].split("_")[-1]
-            finalized_rank_dic[file] = disruption_ranks
+            if len(main_ranks) == len(disruption_ranks):
+                file = file_name.split(".")[0].split("_")[-1]
+                finalized_rank_dic[file] = disruption_ranks
+    except KeyError as e:
+        logging.exception("KeyError ", file_name, e)
 
     kendall_df = kendalltau_to_matrix(finalized_rank_dic)
     kendall_df.to_csv(kendalltau_matrix_output)
@@ -263,11 +281,11 @@ def main():
     disruption_centrality_list = calculate_disruption_centrality_measures(visualize_graph=False)
 
     kendall_df = calculate_kendalltau(disruption_centrality_list, main_centrality_list)
-    print(kendall_df)
+
+    # Linkage code works well with square matrices
+    is_square_matrix(kendall_df)
 
     linkage_matrix = calculate_linkage(kendall_df)
-
-    print(linkage_matrix)
 
     draw_dendrogram(kendall_df, linkage_matrix)
 
