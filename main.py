@@ -178,7 +178,7 @@ def calculate_kendalltau(disruption_centrality_list, main_centrality_list):
     print("Main stations with centrality values", main_centrality_values)
     finalized_rank_dic = dict()
     main_ranks = list(range(20, 0, -1))
-    # finalized_rank_dic['main'] = main_ranks
+    finalized_rank_dic['main'] = main_ranks
     file_name = ""
     try:
         for individual_disruption in disruption_centrality_list:
@@ -274,7 +274,7 @@ def main():
     # Read data from the main edge file
     nodes_df, edges_df = read_data(main_edge_file)
 
-    # show_graph(nodes_df, edges_df)
+    show_graph(nodes_df, edges_df)
     # obtain centrality list for the main edge file
     main_centrality_list = calculate_centrality_measure(nodes_df, edges_df, main_edge_file, top20=True)
 
